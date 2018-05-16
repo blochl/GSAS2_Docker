@@ -1,0 +1,45 @@
+# Use an official Python runtime as a parent image
+FROM debian:stretch-slim
+
+# Set the working directory to /usr/app
+WORKDIR /usr/app
+
+# Install dependencies and initial config
+RUN buildDeps=" \
+        ca-certificates \
+        gfortran \
+        subversion \
+        scons \
+        python-dev \
+        " \
+    && apt-get update && apt-get install -y --no-install-recommends \
+        python \
+        python-numpy \
+        python-scipy \
+        python-wxtools \
+        python-matplotlib \
+        python-opengl \
+        python-pillow \
+        python-h5py \
+        python-openimageio \
+        $buildDeps \
+    && rm -rf /var/lib/apt/lists/*
+
+
+# Download GSAS2
+RUN svn co https://subversion.xray.aps.anl.gov/pyGSAS/trunk GSAS2
+
+# Build it
+WORKDIR /usr/app/GSAS2/fsource
+RUN scons
+WORKDIR /usr/app/GSAS2
+
+# Clean
+RUN rm -rf fsource PyOpenGL-3.0.2a5.zip
+RUN apt-get purge -y --auto-remove $buildDeps
+
+# Configure login env
+ENV TERM=xterm-256color
+
+# Run when the container launches
+ENTRYPOINT ["/bin/bash"]
