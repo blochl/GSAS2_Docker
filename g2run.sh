@@ -12,12 +12,6 @@ if [ -z $(docker images -q ${cont} 2>/dev/null) ]
 then
     echo "First run. Installing..."
     docker build -t "${cont}" \
-        --build-arg HTTP_PROXY="${HTTP_PROXY}" \
-        --build-arg http_proxy="${http_proxy}" \
-        --build-arg HTTPS_PROXY="${HTTPS_PROXY}" \
-        --build-arg https_proxy="${https_proxy}" \
-        --build-arg NO_PROXY="${NO_PROXY}" \
-        --build-arg no_proxy="${no_proxy}" \
         --build-arg user=$USER \
         --build-arg uid=$UID \
         --build-arg group=$(id -g -n ${USER}) \
@@ -26,12 +20,6 @@ then
 fi
 
 docker run -it --rm -w $(pwd) \
-    -e HTTP_PROXY \
-    -e http_proxy \
-    -e HTTPS_PROXY \
-    -e https_proxy \
-    -e NO_PROXY \
-    -e no_proxy \
     -e DISPLAY \
     -e XAUTHORITY="$xauth_file" \
     -v "$xsock":"$xsock":ro \
